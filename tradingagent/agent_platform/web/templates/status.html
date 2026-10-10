@@ -1,0 +1,9 @@
+{% extends "workbench.html" %}
+{% block title %}系统状态{% endblock %}
+{% block heading %}先看证据状态，再做判断{% endblock %}
+{% block scripts %}<script src="/static/status.js" defer></script>{% endblock %}
+{% block content %}
+<div class="status-columns"><section class="entry-section"><h2>行情与账户</h2><dl id="data-status" class="status-facts"></dl></section><section class="entry-section"><h2>评估与回访</h2><dl id="worker-status" class="status-facts"></dl></section></div>
+<section class="entry-section"><h2>模型预算 / USD</h2><p id="budget-note" class="section-note">读取持久费用记录…</p><dl id="budget-status" class="status-facts"></dl><p class="section-note">未知费用继续占用预留；记录不可读时不会显示为零。日边界为 Asia/Shanghai。</p></section>
+<section class="ledger-section"><h2>尚待配置与验证</h2><p><a href="/overview">Haiku 主分析与可选 JEV 建议</a>并行；<a href="/jev-trader">JEV 操盘</a>有独立开关和执行方式。当前模型尚未连接，收费默认关闭。</p><p>操盘模块先验证 testnet，执行器尚未接通。保存设置不会开始下单；真实账户联调与24小时长期运行仍需验证。</p><p id="status-generated" class="section-note"></p></section>
+{% endblock %}

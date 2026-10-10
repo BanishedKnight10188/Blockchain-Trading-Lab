@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="csrf-token" content="{{ csrf_token }}">
+  <title>会话风格 · 交易助手</title>
+  <link rel="stylesheet" href="/static/session.css">
+  <link rel="stylesheet" href="/static/workbench.css">
+  <script src="/static/session.js" defer></script>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="/" aria-label="交易助手首页"><span class="coin">T</span> 交易助手</a>
+    {% include "navigation.html" %}
+  </header>
+  <main>
+    <div class="page-heading">
+      <p class="breadcrumb">会话设置</p>
+      <h1>先确定你的交易节奏</h1>
+      <p>从保守到激进，选择你希望 Agent 采用的判断风格。</p>
+    </div>
+    <div class="workspace">
+      <section class="selection-panel" aria-labelledby="selection-title">
+        <div class="panel-heading"><h2 id="selection-title">交易风格</h2><span id="selection-mode">新会话</span></div>
+        <form id="style-form">
+          <div class="market-selection">
+            <label for="analysis-market">交易市场 · 合约优先</label>
+            <select id="analysis-market"><option value="usdt_perpetual">USDT 永续合约</option><option value="spot">BTCUSDT 现货（已有 Paper）</option></select>
+            <label for="symbol-search">搜索合约</label><input id="symbol-search" type="search" placeholder="例如 ETH、SOL、1000SHIB" autocomplete="off">
+            <label for="analysis-symbol">分析币种</label><select id="analysis-symbol" aria-describedby="contract-note"><option value="">正在读取 Binance 合约目录…</option></select>
+            <label for="history-days">首次历史窗口 · 1 小时 K 线</label><select id="history-days"><option value="1">近 1 天</option><option value="7" selected>近 7 天</option><option value="30">近 30 天</option></select>
+            <p id="contract-note" class="description">默认 USDT 永续合约；现货与合约的行情、账户和模拟钱包分别处理。币种与市场保存在会话中，修改需创建新会话。</p>
+          </div>
+          <div class="style-readout">
+            <label for="style-strength">激进程度</label>
+            <div><output id="style-value" for="style-strength">50</output><span class="scale"> / 100</span></div>
+            <span id="style-label" class="style-label">均衡</span>
+          </div>
+          <input id="style-strength" name="style_strength" type="range" min="0" max="100" step="1" value="50"
+                 aria-describedby="style-description scale-description" aria-valuetext="50，均衡">
+          <div class="scale-labels" id="scale-description"><span>0 最保守</span><span>100 最激进</span></div>
+          <p id="style-description" class="description">在等待确认和及时响应之间保持平衡。</p>
+          <div class="discipline-note"><span class="note-icon" aria-hidden="true">✓</span><p>风格影响判断节奏。你的资金纪律与风险上限始终有效；这个数值不是仓位比例。</p></div>
+          <label class="confirm-row"><input id="style-confirmed" type="checkbox"><span>我确认使用当前选择的交易风格</span></label>
+          <div class="form-actions"><button id="save-style" type="submit" disabled>创建会话</button><button id="reload-session" type="button" class="secondary">重新载入</button></div>
+          <p id="form-message" class="form-message" role="status" aria-live="polite"></p>
+        </form>
+      </section>
+      <aside class="session-panel" aria-labelledby="session-title">
+        <h2 id="session-title">当前会话</h2>
+        <div class="session-state"><span class="state-dot" aria-hidden="true"></span><span id="session-state">尚未创建</span></div>
+        <dl class="session-facts"><div><dt>分析对象</dt><dd id="saved-target">等待选择</dd></div><div><dt>已保存风格</dt><dd id="saved-style">等待选择</dd></div><div><dt>风格版本</dt><dd id="saved-revision">—</dd></div><div><dt>最近保存</dt><dd id="saved-at">—</dd></div></dl>
+        <div class="connection-note"><strong id="connection-title">行情与账户尚未接入</strong><p id="connection-detail">当前可设置和保存会话风格。行情与账户状态可在只读总览查看。</p></div>
+        <div class="form-actions session-actions"><button id="start-session" type="button" disabled>启动评估</button><button id="pause-session" type="button" class="secondary" disabled>暂停</button><button id="close-session" type="button" class="secondary" disabled>结束会话</button></div>
+        <p class="session-run-note">启动后按数据就绪情况评估。暂停和结束会话会撤去当前建议，行情与账户只读同步继续运行。</p>
+        <div class="history-heading"><h3>风格记录</h3><span>保留每次修改</span></div>
+        <ol id="style-history" class="style-history"><li class="empty-history">创建会话后，这里会显示你的选择。</li></ol>
+      </aside>
+    </div>
+    <footer>USDT 永续分析 · 首次分析独立于 JEV · 实盘交易由你执行</footer>
+  </main>
+  <noscript><p class="noscript">请启用 JavaScript，以拖动、确认和保存会话风格。</p></noscript>
+</body>
+</html>

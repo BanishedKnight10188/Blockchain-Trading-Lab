@@ -1,0 +1,13 @@
+{% extends "workbench.html" %}
+{% block title %}复盘版本{% endblock %}
+{% block heading %}回看当时的决定，保留每个版本{% endblock %}
+{% block scripts %}<script src="/static/reviews.js" defer></script>{% endblock %}
+{% block content %}
+<section class="entry-section"><h2>冻结本次复盘范围</h2><p class="section-note">保存当前已导入的 BTCUSDT 成交窗口，最多4096笔。后续成交不会覆盖这个分组；用户报告单独保留。</p><form id="group-form" class="entry-form compact-form"><label>分组名称<input name="group_id" maxlength="128" placeholder="例如：周一上午观察" required autocomplete="off"></label><label class="confirm-row"><input name="confirmed" type="checkbox"><span>我确认冻结当前本地成交范围</span></label><button type="submit" disabled>冻结分组</button></form></section>
+<section class="ledger-section"><div class="panel-heading"><h2>已保存分组</h2><button id="more-groups" type="button" class="secondary" hidden>下一页分组</button></div><div id="group-list" class="group-list"></div></section>
+<section id="selected-group" class="entry-section" hidden><h2 id="selected-title">分组</h2><p id="selected-detail" class="section-note"></p><div class="form-columns">
+<form id="review-form" class="entry-form"><label>生成版本<select name="kind"><option value="initial">初始复盘</option><option value="manual">手工回访</option></select></label><label class="confirm-row"><input name="confirmed" type="checkbox"><span>我确认生成免费规则复盘，不修改会话风格</span></label><button type="submit" disabled>生成复盘版本</button></form>
+<form id="followup-form" class="entry-form"><fieldset><legend>成交结束后的回访</legend><label class="confirm-row"><input name="hour1" type="checkbox"><span>1 小时</span></label><label class="confirm-row"><input name="hour24" type="checkbox"><span>24 小时</span></label></fieldset><label class="confirm-row"><input name="confirmed" type="checkbox"><span>我确认安排已选择的回访时间</span></label><button type="submit" disabled>安排回访</button><p class="section-note">从最后成交时间计算；已过期的新任务可改用手工回访。</p></form></div></section>
+<section class="ledger-section"><div class="panel-heading"><h2>复盘版本</h2><button id="more-versions" type="button" class="secondary" hidden>后续版本</button></div><div id="versions" class="review-list"><p class="section-note">选择一个已保存分组，查看原始事实和后续版本。</p></div></section>
+<section class="ledger-section"><h2>持久回访任务</h2><p class="section-note">任务保存在本机；后端运行时执行。关闭浏览器不会取消。</p><div id="job-list" class="text-history"></div></section>
+{% endblock %}

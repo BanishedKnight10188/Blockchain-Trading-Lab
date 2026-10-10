@@ -1,0 +1,5 @@
+<nav aria-label="工作台导航" class="work-nav">
+{% for path,label in [('/overview','大盘与分析'),('/jev-trader','JEV 操盘'),('/event-agent','事件 Agent'),('/','会话'),('/records','记录'),('/reviews','复盘'),('/status','系统')] %}
+<a href="{{ path }}"{% if request.url.path == path %} aria-current="page"{% endif %}>{{ label }}</a>
+{% endfor %}
+</nav>

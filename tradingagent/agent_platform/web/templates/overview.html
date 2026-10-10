@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="csrf-token" content="{{ csrf_token }}">
+  <title>大盘与分析 · 交易助手</title>
+  <link rel="stylesheet" href="/static/session.css">
+  <link rel="stylesheet" href="/static/overview.css">
+  <link rel="stylesheet" href="/static/workbench.css">
+  <script src="/static/quote-chart.js" defer></script>
+  <script src="/static/overview.js" defer></script>
+  <script src="/static/workbench.js" defer></script>
+  <script src="/static/jev-advice.js" defer></script>
+  <script src="/static/session-analysis.js" defer></script>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="/overview"><span class="coin">T</span> 交易助手</a>
+    {% include "navigation.html" %}
+  </header>
+  <main>
+    <div class="overview-heading"><div><h1 id="workbench-title">行情与分析工作台</h1><p id="mode-note">正在读取数据状态…</p></div><button id="refresh-overview" type="button" class="secondary">重新载入</button></div>
+    <div class="update-line"><span id="update-state" role="status">正在连接本地服务</span><time id="captured-at">尚无采样</time></div>
+    <p id="page-message" role="status" aria-live="polite"></p>
+    <section id="initial-analysis-panel" class="data-panel" hidden>
+      <h2 id="chart-target">所选合约 K 线</h2>
+      <div class="chart-controls">
+        <label for="chart-interval">K 线周期
+          <select id="chart-interval">
+            <option value="1s" disabled>1秒（需接成交流）</option>
+            <option value="1m">1分钟</option><option value="3m">3分钟</option>
+            <option value="5m">5分钟</option><option value="15m">15分钟</option>
+            <option value="30m">30分钟</option><option value="1h" selected>1小时</option>
+            <option value="2h">2小时</option><option value="4h">4小时</option>
+            <option value="6h">6小时</option><option value="8h">8小时</option>
+            <option value="12h">12小时</option><option value="1d">1天</option>
+            <option value="3d">3天</option><option value="1w">1周</option><option value="1M">1月</option>
+          </select>
+        </label>
+        <label for="chart-count">显示根数
+          <select id="chart-count"><option value="100">最近100根</option><option value="300" selected>最近300根</option><option value="499">最多499根</option></select>
+        </label>
+      </div>
+      <p id="chart-status" role="status">正在读取所选周期…</p>
+      <p id="chart-history-note" class="data-note"></p>
+      <svg id="history-chart" viewBox="0 0 760 190" role="img" aria-label="所选 USDT 永续合约的已收盘 OHLC K 线"></svg>
+      <p class="data-note">绿色为上涨、红色为下跌；悬停 K 线查看开高低收，时间为 Asia/Shanghai。仅显示已收盘 K 线，每30秒检查更新。切换图表周期不触发模型；1秒需另接合约成交流聚合，当前不可选。</p>
+      <h3 id="initial-target">会话首次 Haiku 分析</h3>
+      <p id="initial-status" role="status">正在读取历史任务…</p>
+      <p id="initial-history-note" class="data-note"></p>
+      <p id="initial-summary"></p><ul id="initial-details"></ul>
+      <p class="data-note">首次 Haiku 使用会话创建时确认的历史窗口，独立于图表。JEV 在独立操盘页运行，当前合约后端为本地 Paper。</p>
+    </section>
+    <div id="legacy-spot-overview" hidden>
+    <section class="quote-strip" aria-label="行情报价">
+      <div class="last-price"><span>最新成交 / USDT</span><strong id="last-price">—</strong></div>
+      <div><span>最优买价</span><strong id="best-bid">—</strong></div>
+      <div><span>最优卖价</span><strong id="best-ask">—</strong></div>
+      <div class="quote-clock"><span>报价时间</span><strong id="quote-time">—</strong></div>
+    </section>
+    <section class="data-panel quote-chart" aria-labelledby="chart-heading">
+      <h2 id="chart-heading">本页接收的报价走势</h2>
+      <p class="data-note">优先显示实时盘口中间价（买卖价均值，非成交价）；没有有效盘口时显示最新成交价。两类报价分开积累，保留最近120点；纵轴 USDT，时间 Asia/Shanghai。</p>
+      <svg id="quote-chart" viewBox="0 0 760 190" role="img" aria-label="当前浏览器已接收的 BTCUSDT 报价，数据缺口断开"></svg>
+      <p id="chart-note" class="data-note">尚无可绘制的报价；不会生成模拟走势。</p>
+    </section>
+    <div class="overview-columns">
+      <section class="data-panel" aria-labelledby="market-heading">
+        <div class="panel-heading"><h2 id="market-heading">行情与特征</h2><span id="market-state" class="status-tag">未连接</span></div>
+        <p id="market-note" class="data-note">公共行情未启用。启用后将在这里显示接收到的数据。</p>
+        <dl class="metric-list">
+          <div><dt>来源</dt><dd id="market-source">—</dd></div>
+          <div><dt>盘口时间</dt><dd id="book-time">—</dd></div>
+          <div><dt>盘口状态</dt><dd id="book-state">不可用</dd></div>
+          <div><dt>指标状态</dt><dd id="feature-state">不可评估</dd></div>
+          <div><dt>EMA 12 / USDT</dt><dd id="ema-fast">—</dd></div>
+          <div><dt>EMA 26 / USDT</dt><dd id="ema-slow">—</dd></div>
+          <div><dt>ATR 14 / USDT</dt><dd id="atr">—</dd></div>
+          <div><dt>窗口 VWAP / USDT</dt><dd id="vwap">—</dd></div>
+          <div><dt>区间收益率（比值）</dt><dd id="interval-return">—</dd></div>
+          <div><dt>收益波动率（比值）</dt><dd id="volatility">—</dd></div>
+        </dl>
+      </section>
+      <section class="data-panel" aria-labelledby="account-heading">
+        <div class="panel-heading"><h2 id="account-heading">只读账户</h2><span id="account-state" class="status-tag">未连接</span></div>
+        <p id="account-note" class="data-note">账户未启用。界面不会把缺失余额显示为零。</p>
+        <div class="holding-row"><span>已确认持有 / BTC</span><strong id="holding">—</strong></div>
+        <div class="table-wrap"><table class="balance-table"><caption class="visually-hidden">已确认现货余额</caption><thead><tr><th scope="col">资产</th><th scope="col">可用</th><th scope="col">锁定</th></tr></thead><tbody id="balances"><tr><td colspan="3">尚无已确认余额</td></tr></tbody></table></div>
+        <dl class="metric-list account-facts"><div><dt>数据时间</dt><dd id="account-time">—</dd></div><div><dt>最近尝试</dt><dd id="account-attempt">—</dd></div><div><dt>下次同步</dt><dd id="account-next">—</dd></div><div><dt>历史覆盖</dt><dd id="history-state">未确认</dd></div><div><dt>持仓成本</dt><dd>未知，不计算收益</dd></div></dl>
+      </section>
+    </div>
+    <section class="orders-section" aria-labelledby="orders-heading"><div class="panel-heading"><h2 id="orders-heading">当前挂单</h2><span id="orders-note">尚未读取</span></div><div class="table-wrap"><table class="orders-table"><caption class="visually-hidden">BTCUSDT 当前挂单，只读</caption><thead><tr><th scope="col">方向</th><th scope="col">状态</th><th scope="col">数量 / BTC</th><th scope="col">已成交 / BTC</th><th scope="col">价格 / USDT</th></tr></thead><tbody id="orders"><tr><td colspan="5">尚无已确认挂单数据</td></tr></tbody></table></div></section>
+    <section class="advice-note" aria-labelledby="advice-heading">
+      <div class="panel-heading"><h2 id="advice-heading">Haiku 常态主分析</h2><span id="advice-state" class="status-tag">不可评估</span></div>
+      <p id="advice-reason">正在读取会话与评估状态…</p>
+      <p id="advice-explanation"></p>
+      <dl class="metric-list"><div><dt>建议来源</dt><dd id="advice-source">—</dd></div><div><dt>使用风格</dt><dd id="advice-style">—</dd></div><div><dt>证据采集时间</dt><dd id="advice-evidence-time">—</dd></div><div><dt>建议有效至</dt><dd id="advice-expires">—</dd></div><div><dt>数量 / BTC</dt><dd id="advice-quantity">—</dd></div><div><dt>模型费用 / USD</dt><dd id="advice-usage">未调用</dd></div></dl>
+      <p id="hard-alert" role="status" aria-live="polite"></p>
+      <p>Haiku 不等待 JEV；模型未连接时不会虚构分析，收费调用默认关闭。</p><a class="settings-link" href="/">管理会话与风格</a>
+      <p><a href="/records">记录建议反馈与成交来源</a></p>
+    </section>
+    </div>
+    <section class="entry-section"><div class="panel-heading"><h2>可选 JEV 建议</h2><button id="refresh-advice" type="button" class="secondary">重新载入建议设置</button></div>
+      <p class="section-note">JEV 从有效持仓与行情独立判断，不等待 Haiku。此板块只给建议，开关不影响另一页的 JEV 操盘。</p>
+      <form id="advice-form" class="entry-form"><fieldset id="advice-fields" disabled>
+        <label class="confirm-row"><input type="checkbox" name="enabled">开启 JEV 建议</label>
+        <label class="confirm-row"><input type="checkbox" name="confirmed">我确认保存 JEV 建议开关</label><button type="submit" disabled>保存建议设置</button>
+      </fieldset></form><p id="control-revision" class="section-note">正在读取设置…</p><dl id="jev-advice-status" class="status-facts"></dl>
+      <p class="section-note"><a href="/jev-trader">进入独立 JEV 操盘页</a>；模型尚未连接时不显示虚构判断。</p>
+    </section>
+    <footer>建议默认人工执行 · JEV 操盘独立配置、先验证 testnet · 时间为 Asia/Shanghai</footer>
+  </main>
+  <noscript><p class="noscript">请启用 JavaScript，查看本地服务的最新只读数据。</p></noscript>
+</body>
+</html>

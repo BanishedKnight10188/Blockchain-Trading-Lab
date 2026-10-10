@@ -1,0 +1,55 @@
+{% extends "workbench.html" %}
+{% block title %}事件 Agent{% endblock %}
+{% block heading %}研究假设，等待事件，再判断{% endblock %}
+{% block scripts %}<script src="/static/event-agent.js" defer></script>{% endblock %}
+{% block content %}
+<section class="entry-section">
+  <h2>独立运行状态</h2>
+  <p id="agent-capability" class="section-note">正在读取…</p>
+  <p id="agent-wallet"></p>
+  <div class="form-actions">
+    <button id="agent-start" type="button">启用研究与事件判断</button>
+    <button id="agent-pause" type="button" class="secondary">暂停新增决策</button>
+    <button id="agent-analyze" type="button" class="secondary">运行一次研究</button>
+  </div>
+  <p class="section-note">暂停不停止已有仓位的保护。离线模型默认 WAIT；启动开关不授予模型费用。</p>
+</section>
+<div class="form-columns">
+<section class="entry-section"><h2>Paper 资金与纪律</h2>
+<p class="section-note">金额由你明确填写。钱包创建后资金和合约规则固定；模型无法修改这些参数。</p>
+<form id="agent-risk" class="entry-form">
+<label>初始虚拟资金 / USDT<input name="initial_usdt" inputmode="decimal" required></label>
+<label>杠杆上限（1–20）<input name="leverage" type="number" min="1" max="20" required></label>
+<label>最大持仓名义金额 / USDT<input name="max_position_notional" inputmode="decimal" required></label>
+<label>本轮最大亏损 / USDT<input name="max_run_loss_usdt" inputmode="decimal" required></label>
+<label>参考单笔名义金额 / USDT<input name="order_notional_usdt" inputmode="decimal" required></label>
+<label>执行前最大漂移 / bps<input name="max_price_drift_bps" inputmode="decimal" required></label>
+<label>模拟手续费 / bps<input name="fee_bps" value="4" inputmode="decimal" required></label>
+<label>模拟滑点 / bps<input name="slippage_bps" value="1" inputmode="decimal" required></label>
+<label>数量步长<input name="qty_step" inputmode="decimal" required></label>
+<label>最小数量<input name="min_qty" inputmode="decimal" required></label>
+<label>最大数量<input name="max_qty" inputmode="decimal" required></label>
+<label>最小名义金额 / USDT<input name="min_notional" inputmode="decimal" required></label>
+<label>研究与交易要求<textarea name="strategy_instructions" rows="3" maxlength="2048" required></textarea></label>
+<label class="confirm-row"><input name="confirmed" type="checkbox" required>我确认独立 Paper 配置</label>
+<button type="submit">保存并暂停，等待手动启用</button>
+</form></section>
+<section class="entry-section"><h2>创建一个 Watch</h2>
+<p class="section-note">使用已收盘 K 线；默认每个假设只唤醒一次。失效条件优先。</p>
+<form id="agent-watch" class="entry-form">
+<label>研究假设<textarea name="hypothesis" rows="3" maxlength="4096" required></textarea></label>
+<label>周期<select name="timeframe"><option value="1m">1 分钟</option><option value="5m">5 分钟</option></select></label>
+<label>有效分钟数（1–1440）<input name="minutes" type="number" min="1" max="1440" value="60" required></label>
+<label>触发指标<select name="metric"><option value="candle.close">收盘价</option><option value="candle.low">最低价</option><option value="candle.high">最高价</option><option value="volume_ratio_20">20 根量比</option><option value="ema_12">EMA 12</option><option value="ema_26">EMA 26</option><option value="atr_14">ATR 14</option></select></label>
+<label>比较<select name="op"><option value="GT">大于</option><option value="LT">小于</option><option value="GTE">大于等于</option><option value="LTE">小于等于</option></select></label>
+<label>阈值<input name="value" inputmode="decimal" required></label>
+<label>失效：收盘价低于（可选）<input name="invalid_below" inputmode="decimal"></label>
+<button type="submit">保存假设并开始监控</button>
+</form>
+<h2>当前假设</h2><div id="agent-watches" class="text-history"></div>
+</section></div>
+<section class="ledger-section"><h2>决策与实际成交</h2><p class="section-note">工具意图、执行回执和费用分别保留。unknown 表示需要核对，不能自动重发。</p>
+<div id="agent-runs" class="text-history"></div>
+<div class="table-wrap"><table><thead><tr><th>命令</th><th>状态</th><th>成交数量</th><th>成交价格</th><th>手续费 / USDT</th></tr></thead><tbody id="agent-executions"></tbody></table></div>
+<h2>事件、费用与保护</h2><pre id="agent-evidence"></pre></section>
+{% endblock %}

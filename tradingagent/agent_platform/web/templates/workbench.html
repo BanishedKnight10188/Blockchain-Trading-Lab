@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="csrf-token" content="{{ csrf_token }}">
+  <title>{% block title %}{% endblock %} · 交易助手</title>
+  <link rel="stylesheet" href="/static/session.css">
+  <link rel="stylesheet" href="/static/workbench.css">
+  <script src="/static/workbench.js" defer></script>
+  {% block scripts %}{% endblock %}
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="/overview"><span class="coin">T</span> 交易助手</a>
+    {% include "navigation.html" %}
+  </header>
+  <main>
+    <div class="work-heading"><div><h1>{% block heading %}{% endblock %}</h1><p id="data-mode">正在读取本地记录…</p></div><button id="refresh-page" class="secondary" type="button">重新载入</button></div>
+    <p id="page-message" role="status" aria-live="polite"></p>
+    {% block content %}{% endblock %}
+    <footer>USDT 永续合约优先 · 现货与合约分别处理 · 自动模式先跑模拟盘再接 Testnet · 时间为 Asia/Shanghai</footer>
+  </main>
+  <noscript><p class="noscript">请启用 JavaScript，读取与管理本地记录。</p></noscript>
+</body>
+</html>

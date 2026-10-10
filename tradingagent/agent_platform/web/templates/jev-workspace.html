@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="csrf-token" content="{{ csrf_token }}">
+  <title>JEV 工作台 · 交易助手</title>
+  <link rel="stylesheet" href="/static/jev-workspace.css">
+  <link rel="stylesheet" href="/static/jev-market-quote.css">
+  <link rel="stylesheet" href="/static/jev-cadence.css">
+  <link rel="stylesheet" href="/static/contract-selector.css">
+  <link rel="stylesheet" href="/static/jev-archive.css">
+  <script src="/static/contract-selector.js" defer></script>
+  <script src="/static/jev-decision-messages.js" defer></script>
+  <script src="/static/jev-archive.js" defer></script>
+  <script src="/static/jev-workspace.js" defer></script>
+</head>
+<body>
+  <aside class="sidebar" aria-label="JEV 会话">
+    <a class="brand" href="/workbench"><span class="brand-mark">J</span><span>JEV 工作台<small>USDT 永续 · 本地模拟</small></span></a>
+    <button id="new-task" class="primary" type="button">＋ 新建会话</button>
+    <div class="sidebar-label">会话 <span id="task-count">0</span></div>
+    <nav id="task-list" aria-label="会话列表"></nav>
+    <div class="shared-budget"><small>模型费用 · 共用 OpenRouter Key</small><strong id="shared-remaining">读取中…</strong><span id="shared-cap"></span></div>
+    <details class="legacy-links"><summary>原有记录与设置</summary><a href="/overview">大盘与原有分析</a><a href="/records">手工交易记录</a><a href="/status">连接状态</a></details>
+  </aside>
+  <main>
+    <p id="notice" role="status" aria-live="polite"></p>
+    <section id="wizard" hidden>
+      <header class="heading"><div><p class="eyebrow">新建会话</p><h1>配置一次，进入工作区</h1><p>其他 JEV 会话继续在后台运行。</p></div><button id="cancel-wizard" type="button">返回会话</button></header>
+      <ol class="steps"><li data-step="0">1 选择用途</li><li data-step="1">2 市场与风格</li><li data-step="2">3 资金与策略</li></ol>
+      <form id="task-form">
+        <fieldset class="wizard-panel" data-panel="0"><legend>让 JEV 做什么？</legend>
+          <label class="mode-option"><input type="radio" name="kind" value="jev_trader" checked><span><strong>自动模拟操盘</strong><small>JEV 选择仓位、杠杆和退出时机，使用独立虚拟钱包；每笔交易存档。</small></span></label>
+          <label class="mode-option"><input type="radio" name="kind" value="jev_advice"><span><strong>实时监控 · 给出建议</strong><small>持续保存 JEV 的决策和参数，由你执行；参考虚拟钱包不会成交。</small></span></label>
+          <div class="planned"><strong>常规 Agent 分析 <span>规划中</span></strong><p>由 LLM 编写定时分析脚本，脚本持续监测；当前暂不开发。</p></div>
+        </fieldset>
+        <fieldset class="wizard-panel" data-panel="1" hidden><legend>选择合约与交易风格</legend>
+          <div class="field-grid"><label>会话名称<input name="name" maxlength="80" placeholder="例如 ETH 趋势跟踪"></label><div><label for="symbol-input">Binance USDT 永续合约</label><input id="contract-search" type="search" aria-label="搜索 USDT 永续合约" placeholder="搜索币种，如 ETH / SOL" autocomplete="off"><select id="symbol-input" name="symbol" aria-describedby="catalog-status" required disabled><option value="">正在获取合约目录…</option></select><div class="contract-tools"><small id="catalog-status">正在获取全部 USDT 永续合约…</small><button id="reload-contracts" type="button">重新获取币种</button></div></div><label>首次历史窗口<select name="history_days"><option value="1">近 1 天</option><option value="7" selected>近 7 天</option><option value="30">近 30 天</option></select><small>模型历史为已收盘 1 小时 K 线，图表周期可另选。</small></label></div>
+          <div class="style-selection"><label for="task-style">交易风格 <output id="style-value">50</output></label><input id="task-style" name="style_strength" type="range" min="0" max="100" step="1" value="50"><div class="range-labels"><span>0 · 最保守</span><span>100 · 最激进</span></div><p>下一步确认这个整数值。风格始终受资金与杠杆限额约束。</p></div>
+          <label>JEV 输入方式<select name="context_mode" aria-describedby="context-mode-note"><option value="multiscale" selected>六层输入：四层背景 + 20 根 3m + 60 根 1s</option><option value="legacy">原有小时历史（兼容旧会话）</option></select><small id="context-mode-note">六层模式独立整理 90 天、30 天、7 天、1 天背景；首次需积累 60 根真实秒线。背景模型需配置，费用由 OpenRouter API Key 的限额管理。</small></label>
+        </fieldset>
+        <fieldset class="wizard-panel" data-panel="2" hidden><legend id="funds-title">设置独立模拟钱包</legend>
+          <label>JEV 分析间隔<select name="decision_interval_seconds" aria-describedby="new-cadence-note"><option value="1">1 秒</option><option value="2">2 秒</option><option value="3">3 秒</option><option value="4">4 秒</option><option value="5">5 秒</option><option value="6">6 秒</option><option value="7">7 秒</option><option value="8">8 秒</option><option value="9">9 秒</option><option value="10">10 秒</option></select><small id="new-cadence-note">仅影响此会话发起预测的频率；行情与持仓维护仍每秒运行。</small></label>
+          <div class="field-grid"><label>初始虚拟资金（USDT）<input name="initial_usdt" type="number" min="1" step="any" value="1000" required></label><label>最大名义仓位（USDT）<input name="max_position_notional" type="number" min="1" step="any" value="500" required></label><label>本会话最大亏损（USDT）<input name="max_run_loss_usdt" type="number" min="0.01" step="any" value="20" required></label></div>
+          <label>给 JEV 的策略要求<textarea name="strategy_instructions" maxlength="2048" rows="3" required>根据当前行情和持仓选择开仓、加仓、减仓或等待，自主决定止盈止损时机；遵守资金、仓位和杠杆限额。</textarea></label>
+          <details class="advanced"><summary>杠杆与高级参数</summary><div class="field-grid"><label>允许杠杆上限<input name="max_leverage" type="number" min="1" max="20" value="10" required></label><label>JEV 可选杠杆<input name="leverage_choices" value="1,2,5,10" required><small>最多 4 个整数，实际由 JEV 选择。</small></label><label>开仓保证金比例（% 权益）<input name="entry_margin_percents" value="5,10,20" required></label><label>加减仓比例（% 当前数量）<input name="position_change_percents" value="10,20,50" required></label><label>最低置信度<input name="min_confidence" type="number" min="0" max="1" step="0.01" value="0.8" required></label><label>成交费（基点）<input name="fee_bps" type="number" min="0" max="9999" step="any" value="5" required></label><label>滑点（基点）<input name="slippage_bps" type="number" min="0" max="9999" step="any" value="1" required></label><label>最大价格偏移（基点）<input name="max_price_drift_bps" type="number" min="0" max="1000" step="any" value="20" required></label></div></details>
+          <div class="review"><strong id="creation-summary"></strong><p>按所选间隔发起预测，最多 3 个并行请求；超时结果不会成交。模型费用按会话记账，金额上限由 OpenRouter API Key 管理。</p><label class="inline"><input type="checkbox" name="start" checked>创建后立即启动（真实 JEV 会产生模型费用）</label></div>
+        </fieldset>
+        <div class="wizard-actions"><button id="previous-step" type="button" hidden>上一步</button><button id="next-step" class="primary" type="button">下一步</button><button id="create-task" class="primary" type="submit" hidden>创建并启动</button></div>
+      </form>
+    </section>
+    <section id="workspace" hidden>
+      <header class="heading"><div><p class="eyebrow" id="task-mode"></p><h1 id="task-title"></h1><p id="task-subtitle"></p></div><div class="actions"><span id="run-status" class="status-pill"></span><button id="start-task" class="primary" type="button">启动</button><button id="pause-task" type="button">暂停</button><button id="close-task" type="button">结束会话</button></div></header>
+      <p id="task-warning" class="warning" hidden></p>
+      <section class="input-settings" aria-label="JEV 输入方式">
+        <div class="cadence-controls"><label for="input-mode">JEV 输入方式</label><select id="input-mode" aria-describedby="input-mode-note"><option value="multiscale">六层输入</option><option value="legacy">原有小时历史</option></select><button id="save-input-mode" type="button">保存输入方式</button></div>
+        <p id="context-status" role="status"></p>
+        <p id="input-mode-note" class="cadence-note">暂停后可切换，保留钱包、持仓与交易档案。</p>
+      </section>
+      <div class="metrics"><div><small id="equity-label">模拟净权益 · USDT</small><strong id="equity">—</strong></div><div><small>可用资金 · USDT</small><strong id="free">—</strong></div><div><small>持仓 / 实际杠杆</small><strong id="position">—</strong></div><div><small>已实现 / 未实现盈亏</small><strong id="pnl">—</strong></div></div>
+      <section class="market">
+        <div class="section-heading"><h2 id="market-title">合约行情</h2><label>图表周期<select id="chart-interval"><option>1m</option><option>3m</option><option>5m</option><option>15m</option><option>30m</option><option selected>1h</option><option>2h</option><option>4h</option><option>6h</option><option>8h</option><option>12h</option><option>1d</option><option>3d</option><option>1w</option><option>1M</option></select></label></div>
+        <div id="market-quotes" class="market-quote-strip" aria-label="合约实时报价">
+          <div class="quote-meta"><span id="quote-source">Binance 公共行情</span><span id="quote-status" class="quote-status" role="status">等待报价</span></div>
+          <dl class="quote-values">
+            <div class="quote-mark"><dt>标记价格 <span>USDT</span></dt><dd id="mark-price">—</dd></div>
+            <div class="quote-bid"><dt>买一价格 <span>USDT</span></dt><dd id="bid-price">—</dd></div>
+            <div class="quote-ask"><dt>卖一价格 <span>USDT</span></dt><dd id="ask-price">—</dd></div>
+            <div class="quote-time"><dt>行情更新时间</dt><dd id="quote-time">—</dd></div>
+          </dl>
+          <p id="quote-line" class="quote-note">等待公共报价</p>
+        </div>
+        <p id="chart-message">正在读取已收盘历史…</p><canvas id="price-chart" aria-label="所选合约已收盘 K 线" role="img"></canvas>
+      </section>
+      <section class="records"><div class="section-heading"><div><h2>JEV 决策</h2><p id="prediction-info"></p></div><div class="cadence-controls"><label for="decision-interval">分析间隔</label><select id="decision-interval" aria-describedby="cadence-note"><option value="1">1 秒</option><option value="2">2 秒</option><option value="3">3 秒</option><option value="4">4 秒</option><option value="5">5 秒</option><option value="6">6 秒</option><option value="7">7 秒</option><option value="8">8 秒</option><option value="9">9 秒</option><option value="10">10 秒</option></select><button id="save-cadence" type="button">保存间隔</button><button id="refresh-task" type="button">刷新</button></div></div><p id="cadence-note" class="cadence-note">暂停后可调整，仅影响此会话；行情与持仓维护仍每秒运行。</p><div class="table-scroll"><table><thead><tr><th>时间</th><th>决策</th><th>仓位 / 杠杆方案</th><th>置信度</th><th>调用总耗时</th><th>结果</th></tr></thead><tbody id="decision-rows"></tbody></table></div></section>
+      <section class="records" aria-label="成交与资金档案">
+        <div class="section-heading"><div><h2>成交与资金档案</h2><p id="archive-info"></p></div><div class="actions"><a id="export-jsonl" class="button" href="#">完整 JSONL</a><a id="export-csv" class="button" href="#">CSV</a><button id="show-archive" type="button">刷新档案</button><button id="archive-json" type="button" disabled>JSON</button></div></div>
+        <div id="archive-detail">
+          <div class="table-scroll"><table class="archive-table"><thead><tr><th>时间 / 编号</th><th>类型 / 操作</th><th>数量 / 杠杆</th><th>成交价 / 标记价（USDT）</th><th>资金变化（USDT）</th><th>查看</th></tr></thead><tbody id="archive-rows"><tr><td colspan="6">正在读取成交与资金流水…</td></tr></tbody></table></div>
+          <div class="archive-footer"><p id="archive-status" role="status"></p><button id="archive-next" type="button" disabled>下一页</button></div>
+          <pre id="archive-content" class="archive-raw" hidden></pre>
+        </div>
+      </section>
+      <footer>切换会话不会停止后台 · 程序重启后恢复暂停 · 虚拟钱包以 USDT 计价 · 时间为 Asia/Shanghai</footer>
+    </section>
+  </main>
+  <noscript>请启用 JavaScript 来管理 JEV 会话。</noscript>
+</body>
+</html>

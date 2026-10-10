@@ -1,0 +1,23 @@
+{% extends "workbench.html" %}
+{% block title %}交易记录{% endblock %}
+{% block heading %}把观点与实际成交分开记录{% endblock %}
+{% block scripts %}<script src="/static/records.js" defer></script>{% endblock %}
+{% block content %}
+<section class="ledger-section"><div class="panel-heading"><h2>已导入成交</h2><span id="trade-count">等待载入</span></div><p class="section-note">来源未确认时保持未归属；每次修改会保留旧版本。</p>
+<div class="table-wrap"><table><thead><tr><th>时间</th><th>方向</th><th>数量 / BTC</th><th>金额 / USDT</th><th>手续费</th><th>来源</th><th>归属</th></tr></thead><tbody id="trade-rows"></tbody></table></div><button id="more-trades" type="button" class="secondary" hidden>下一页成交</button></section>
+<div class="form-columns">
+<section class="entry-section"><h2>记录建议反馈</h2><p id="current-advice" class="section-note">读取当前建议…</p><form id="feedback-form" class="entry-form">
+<label>反馈类型<select name="kind"><option value="independent">我的独立想法</option><option value="accepted">采纳原建议</option><option value="rejected">拒绝原建议</option><option value="modified">修改后决定</option></select></label>
+<label id="feedback-reference">建议标识<input name="recommendation_id" maxlength="128" autocomplete="off"></label>
+<div id="human-idea"><label>我的观点<select name="action"><option value="hold">等待 / 持有</option><option value="buy">买入</option><option value="sell">卖出</option></select></label><label>计划数量 / BTC（可不填）<input name="quantity" inputmode="decimal" autocomplete="off"></label></div>
+<label>原因<textarea name="explanation" rows="3" maxlength="2048" required></textarea></label>
+<label class="confirm-row"><input name="confirmed" type="checkbox"><span>我确认记录这个决定；这不代表成交已执行</span></label><button type="submit" disabled>保存反馈</button></form></section>
+<section class="entry-section"><h2>记录自己的成交报告</h2><p class="section-note">报告标为“用户报告”。只有本地导入的明确成交匹配后才会核实。</p><form id="report-form" class="entry-form">
+<div class="field-pair"><label>方向<select name="side"><option value="buy">买入</option><option value="sell">卖出</option></select></label><label>执行时间（上海）<input name="executed_at" type="datetime-local" step="1" required></label></div>
+<div class="field-pair"><label>价格 / USDT<input name="price" inputmode="decimal" required autocomplete="off"></label><label>数量 / BTC<input name="quantity" inputmode="decimal" required autocomplete="off"></label></div>
+<label>Binance 成交标识（可不填）<input name="exchange_trade_id" maxlength="128" autocomplete="off"></label><label class="confirm-row"><input name="confirmed" type="checkbox"><span>我确认这是本人报告，尚未作为交易所事实核实</span></label><button type="submit" disabled>保存用户报告</button></form></section>
+</div>
+<section class="entry-section" id="attribution-section" hidden><h2>确认这笔成交的来源</h2><form id="attribution-form" class="entry-form compact-form"><label>成交标识<input name="trade_id" readonly></label><input name="expected_revision" type="hidden"><label>决策来源<select name="author"><option value="human">我自己的决定</option><option value="agent">参考了 Agent 原建议</option></select></label><label>原建议标识（参考 Agent 时填写）<input name="recommendation_id" maxlength="128"></label><label>说明<textarea name="explanation" maxlength="2048" rows="2" required></textarea></label><label class="confirm-row"><input name="confirmed" type="checkbox"><span>我明确确认来源，最终决策与执行者是本人</span></label><button type="submit" disabled>追加归属记录</button></form></section>
+<section class="ledger-section"><h2>用户报告与核实</h2><div class="table-wrap"><table><thead><tr><th>执行时间</th><th>方向</th><th>价格</th><th>数量 / BTC</th><th>核实状态</th><th>操作</th></tr></thead><tbody id="report-rows"></tbody></table></div></section>
+<section class="ledger-section"><h2>已保存反馈</h2><div id="feedback-history" class="text-history"></div></section>
+{% endblock %}

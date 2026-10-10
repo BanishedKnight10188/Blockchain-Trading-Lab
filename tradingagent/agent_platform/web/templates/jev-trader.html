@@ -1,0 +1,83 @@
+{% extends "workbench.html" %}
+{% block title %}JEV 操盘{% endblock %}
+{% block heading %}独立 JEV 操盘模块{% endblock %}
+{% block scripts %}<script src="/static/jev-trader.js" defer></script><script src="/static/paper-trader.js" defer></script><script src="/static/futures-archive.js" defer></script><script src="/static/futures-trader.js" defer></script>{% endblock %}
+{% block content %}
+<section class="entry-section"><h2>操盘设置</h2><p class="section-note">此模块独立决策与执行，不等待 Haiku 或 JEV 建议。Haiku 主分析和 JEV 建议开关保持不变。</p>
+  <form id="trader-form" class="entry-form"><fieldset id="trader-fields" disabled>
+    <label class="confirm-row"><input type="checkbox" name="enabled">开启 JEV 操盘模块</label>
+    <label for="trader-mode">操盘方式</label><select id="trader-mode" name="mode"><option value="advisory">给出建议，人工执行</option><option value="auto">自动操盘</option></select>
+    <label for="trader-environment">执行环境</label><select id="trader-environment" name="execution_environment"><option value="paper">本地 Paper · 虚拟资金</option><option value="testnet">Binance Testnet · 待接入</option></select>
+    <label class="confirm-row"><input type="checkbox" name="confirmed">我确认保存操盘模块的设置</label><button type="submit" disabled>保存操盘设置</button>
+  </fieldset></form><p id="trader-revision" class="section-note">正在读取设置…</p><dl id="trader-status" class="status-facts"></dl>
+</section>
+<section class="entry-section"><h2>本地模拟操盘</h2><p id="paper-market" class="section-note">正在确认当前交易市场…</p><p id="paper-source" class="section-note">正在读取模拟模块…</p>
+  <div id="spot-paper-controls" hidden>
+  <h3>BTCUSDT 现货模拟钱包</h3>
+  <p>先在<a href="/">会话页</a>确认 0–100 风格，再保存上方“开启 + 自动 + Paper”。风格不能改变资金上限。</p>
+  <form id="paper-configure" class="entry-form"><fieldset id="paper-config-fields" disabled>
+    <label>初始虚拟 USDT<input name="initial_usdt" inputmode="decimal" value="1000" required></label>
+    <label>每次 BTC 数量<input name="order_quantity" inputmode="decimal" value="0.001" required></label>
+    <label>最大 BTC 持仓<input name="max_position_quantity" inputmode="decimal" value="0.01" required></label>
+    <label>全程亏损上限（USDT）<input name="max_run_loss_usdt" inputmode="decimal" value="50" required></label>
+    <label>模拟手续费（bps）<input name="fee_bps" inputmode="decimal" value="10" required></label>
+    <label>模拟滑点（bps）<input name="slippage_bps" inputmode="decimal" value="2" required></label>
+    <label>成交前价格漂移上限（bps）<input name="max_price_drift_bps" inputmode="decimal" value="20" required></label>
+    <label>最低模型置信度（0–1）<input name="min_confidence" inputmode="decimal" value="0.8" required></label>
+    <label>本轮策略<textarea name="strategy_instructions" maxlength="2048" required placeholder="请填写你希望 JEV 遵循的入场、减仓与等待条件"></textarea></label>
+    <label class="confirm-row"><input type="checkbox" name="confirmed">确认以上模拟资金与纪律；本会话不重复充值</label><button type="submit" disabled>建立虚拟资金账户</button>
+  </fieldset></form>
+  <dl id="paper-wallet" class="status-facts"></dl>
+  <form id="paper-action" class="entry-form"><fieldset id="paper-action-fields" disabled>
+    <label>运行操作<select name="action"><option value="start">启动独立 JEV Paper 循环</option><option value="pause">暂停 Paper 循环</option></select></label>
+    <label class="confirm-row"><input type="checkbox" name="confirmed">确认操作虚拟资金；真实 JEV 仍按本机费用上限计费</label><button type="submit" disabled>确认运行操作</button>
+  </fieldset></form>
+  <p class="section-note">报价更新后按 60 秒节奏独立决策；暂停、风格或操盘配置变化会拒绝旧结果。重启保留资金与历史，默认暂停。Paper 过滤器与成交模型为模拟规则。</p>
+  </div>
+</section>
+<section id="spot-paper-history" class="ledger-section" hidden><h2>最近现货模拟决策与成交</h2><div class="table-scroll"><table><thead><tr><th>时间</th><th>判断 / 置信度</th><th>结果 / 原因</th><th>虚拟成交</th><th>模型费用 USD</th></tr></thead><tbody id="paper-cycles"></tbody></table></div></section>
+<section id="futures-controls" class="entry-section" hidden>
+  <h2>USDT 永续合约操盘</h2><p id="futures-source" class="section-note"></p>
+  <p>在<a href="/">会话页</a>选择合约与历史范围，确认 0–100 风格并点击“启动合约会话”；上方保存“开启 + 自动 + Paper”。换币创建的新会话也需要启动，每个会话只建立一个虚拟钱包。</p>
+  <p id="futures-session-status" class="section-note" hidden><span id="futures-session-message"></span> <a href="/">前往会话页</a></p>
+  <form id="futures-configure" class="entry-form"><fieldset id="futures-config-fields" disabled>
+    <label>初始虚拟 USDT<input name="initial_usdt" inputmode="decimal" value="1000" required></label>
+    <label>决策方式<select name="decision_mode"><option value="parameterized">JEV选择仓位比例与杠杆</option><option value="fixed_notional">固定金额与杠杆（旧模式）</option></select></label>
+    <label>初始杠杆（开仓时 JEV 可重选）<input name="leverage" type="number" min="1" max="20" step="1" value="5" required></label>
+    <label>最大允许杠杆<input name="max_leverage" type="number" min="1" max="20" step="1" value="5" required></label>
+    <label>可选杠杆（逗号分隔）<input name="leverage_choices" value="1,2,5" required></label>
+    <label>开仓保证金 / 净权益（%，逗号分隔）<input name="entry_margin_percents" value="5,10,20" required></label>
+    <label>加减仓 / 当前合约数量（%，逗号分隔）<input name="position_change_percents" value="10,20,50" required></label>
+    <label>旧模式每次增加的名义金额（USDT）<input name="order_notional_usdt" inputmode="decimal" value="100" required></label>
+    <label>最大持仓名义金额（USDT）<input name="max_position_notional" inputmode="decimal" value="1000" required></label>
+    <label>累计亏损上限（USDT）<input name="max_run_loss_usdt" inputmode="decimal" value="50" required></label>
+    <label>模拟手续费（bps）<input name="fee_bps" inputmode="decimal" value="5" required></label>
+    <label>模拟滑点（bps）<input name="slippage_bps" inputmode="decimal" value="2" required></label>
+    <label>成交前漂移上限（bps）<input name="max_price_drift_bps" inputmode="decimal" value="20" required></label>
+    <label>最低模型置信度（0–1）<input name="min_confidence" inputmode="decimal" value="0.8" required></label>
+    <label>交易策略<textarea name="strategy_instructions" maxlength="2048" placeholder="填写入场、平仓与等待条件" required></textarea></label>
+    <label class="confirm-row"><input type="checkbox" name="confirmed">确认虚拟资金、策略与纪律；本会话不重复充值</label><button type="submit">建立合约虚拟钱包</button>
+  </fieldset></form>
+  <p class="section-note">参数模式由 JEV 在完整方案中选择比例和杠杆，程序计算数量并执行风控。开仓 20% 指净权益的 20% 作保证金；加仓或减仓 20% 指当前合约数量的 20%。加仓时改变杠杆作用于整个逐仓仓位；全平单独处理。初始杠杆不限制 JEV 后续选择，候选杠杆须在允许上限内。</p>
+  <p class="section-note">止盈、止损时机由 JEV 根据行情、持仓均价和盈亏判断，可选择部分减仓或全平，无需预设固定比例。程序保留资金与亏损纪律。JEV 按决策周期判断；模型或行情中断时没有新的 JEV 平仓决定，当前没有交易所保护挂单。</p>
+  <dl id="futures-wallet" class="status-facts"></dl>
+  <dl id="futures-budget" class="status-facts"></dl>
+  <dl id="futures-cadence" class="status-facts"></dl>
+  <p id="futures-market-status" class="section-note"></p>
+  <form id="futures-action" class="entry-form"><fieldset id="futures-action-fields" disabled>
+    <label>运行操作<select name="action"><option value="start">启动合约决策循环</option><option value="pause">暂停增加或减少持仓</option></select></label>
+    <label class="confirm-row"><input type="checkbox" name="confirmed">确认操作虚拟资金；真实模型调用仍受费用限制</label><button type="submit">确认运行操作</button>
+  </fieldset></form>
+  <p class="section-note">合约通道目标每 1 秒发起 JEV 预测，最多 3 个预测并行；模型完成延迟见实际指标，不能保证 1 秒返回。实时最优买卖价与 1 秒标记价用于预测；超过有效期或被较新有效判断替代的结果不执行，满载时跳过时点。执行与资金维护串行，每秒预测可选择不交易。参数模式可部分减仓或全平，不直接反转。暂停或只读时继续维护已有持仓；重启保留资金并暂停。模拟维持率 0.5%、清算费 50 bps；资金费待发布时阻断，不猜算结算。</p>
+</section>
+<section id="futures-history" class="ledger-section" hidden><h2>最近合约决策</h2><div class="table-scroll"><table><thead><tr><th>时间</th><th>判断 / 置信度</th><th>结果 / 原因</th><th>命令</th><th>费用 USD</th></tr></thead><tbody id="futures-cycles"></tbody></table></div><h3>资金与成交记录</h3><div class="table-scroll"><table><thead><tr><th>时间</th><th>操作</th><th>数量 / 价格</th><th>手续费 / 资金费 USDT</th></tr></thead><tbody id="futures-operations"></tbody></table></div></section>
+<section id="futures-archive" class="ledger-section" hidden>
+  <h2>逐笔合约档案</h2><p id="futures-archive-status" class="section-note">正在读取档案…</p>
+  <p class="section-note">每笔成交、资金费和清算与资金变动一同存档；成交包含前后账户、报价、数量、杠杆、手续费与盈亏。JEV 交易另存完整模型输入和概率返回。旧记录缺失的证据会标注，不补造历史。</p>
+  <p><button id="futures-archive-refresh" type="button">刷新档案</button> <button id="futures-archive-next" type="button" disabled>下一页</button> <a id="futures-export-jsonl" href="/api/futures-trading/archive/export?format=jsonl">完整 JSONL</a> · <a id="futures-export-csv" href="/api/futures-trading/archive/export?format=csv">CSV 汇总</a></p>
+  <p class="section-note">JSONL 保留完整详情和 SHA-256 链；CSV 便于逐笔查看。查询和导出先校验链及原交易记录，当前分页使用固定快照，刷新后纳入新成交。模型 WAIT 和拒绝结果保存在决策记录中。</p>
+  <div class="table-scroll"><table><thead><tr><th>序号 / 时间</th><th>币种 / 操作</th><th>数量 / 价格</th><th>杠杆 / 手续费</th><th>证据来源 / 详情</th></tr></thead><tbody id="futures-archive-rows"></tbody></table></div>
+</section>
+<section class="entry-section"><h2>Testnet 接续</h2><p id="trader-readiness">先完成本地 Paper，再接 Binance Testnet。当前没有测试网或真实资金下单能力。</p><p class="section-note">主账户、testnet 与模拟资金分别处理，不使用主分析的生产账户事实冒充模拟持仓。</p></section>
+<section class="ledger-section"><a href="/overview">返回大盘与 Haiku 分析</a><p class="section-note">本模块的开关和版本独立保存；所有模型调用仍计入共同的预算上限，资金纪律不受风格影响。</p></section>
+{% endblock %}

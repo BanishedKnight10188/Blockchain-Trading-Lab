@@ -1,0 +1,143 @@
+{
+  "scope": [
+    1,
+    2,
+    3
+  ],
+  "branch": "codex/event-watch-core",
+  "verification": {
+    "joint_passed": 199,
+    "known_legacy_architecture_item_deselected": 1,
+    "legacy_architecture_violating_files": [
+      "application/futures_trading.py",
+      "application/jev_tasks.py"
+    ],
+    "watch_data_followup_passed": 11
+  },
+  "files": [
+    {
+      "path": "D:\\develop\\tradingagent\\Blockchain-Trading-Lab\\tradingagent\\agent_platform\\domain\\watches.py",
+      "sha256": "14ed455aa07863a685a93978bf2e01a464baa4a74d7321d95515441a03adce3a"
+    },
+    {
+      "path": "D:\\develop\\tradingagent\\Blockchain-Trading-Lab\\tradingagent\\agent_platform\\domain\\watch_features.py",
+      "sha256": "f9ca679d75ebe1fc378ae45b68f1b3b6416508f5ac53a461403c060a264cb698"
+    },
+    {
+      "path": "D:\\develop\\tradingagent\\Blockchain-Trading-Lab\\tradingagent\\agent_platform\\domain\\watch_rules.py",
+      "sha256": "dea3532f18388940e6f8982272855bd2ae8051fcbf3d6cb86e0fb0900c731df2"
+    },
+    {
+      "path": "D:\\develop\\tradingagent\\Blockchain-Trading-Lab\\tradingagent\\agent_platform\\domain\\agent_events.py",
+      "sha256": "f36bcc36ddff1aba3ff2598cff02fe757119b7c8719a55bdfd922e726e356a5b"
+    },
+    {
+      "path": "D:\\develop\\tradingagent\\Blockchain-Trading-Lab\\tradingagent\\agent_platform\\ports\\watches.py",
+      "sha256": "d361625c371796b3f1dfb19c7804af07af23a688b3568c447ae7eae1a24949e8"
+    },
+    {
+      "path": "D:\\develop\\tradingagent\\Blockchain-Trading-Lab\\tradingagent\\agent_platform\\ports\\agent_events.py",
+      "sha256": "a3c23aa7e8b2520229ec945f82b801e95d40dff423ea782f7973da5b88e05205"
+    },
+    {
+      "path": "D:\\develop\\tradingagent\\Blockchain-Trading-Lab\\tradingagent\\agent_platform\\ports\\watch_data.py",
+      "sha256": "e53415b79105546e0e1453e93c28ba4fbb2b71e5bb235075f38e603caa9cc32e"
+    },
+    {
+      "path": "D:\\develop\\tradingagent\\Blockchain-Trading-Lab\\tradingagent\\agent_platform\\adapters\\sqlite\\watches.py",
+      "sha256": "3a6621a11cd3dea16fc316a4d596f51fcb26c6ccb45c395a38e95b97557862ab"
+    },
+    {
+      "path": "D:\\develop\\tradingagent\\Blockchain-Trading-Lab\\tradingagent\\agent_platform\\adapters\\sqlite\\agent_events.py",
+      "sha256": "2ef8510f9e9cc0d1ef23c897188328186bc16c86cdbcc6d91a36eeaadeadb2a0"
+    },
+    {
+      "path": "D:\\develop\\tradingagent\\Blockchain-Trading-Lab\\tradingagent\\agent_platform\\adapters\\sqlite\\schema.py",
+      "sha256": "c6e5127ae48357cf0c3f579656f35bcb7cc9ab871894cd7c5b3c524048c4d1a8"
+    },
+    {
+      "path": "D:\\develop\\tradingagent\\Blockchain-Trading-Lab\\tradingagent\\agent_platform\\adapters\\sqlite\\migrations.py",
+      "sha256": "20ea93a0ed84f4d39664b3a4e6c84d8293f94bcb4ad9888474d06be509202d06"
+    },
+    {
+      "path": "D:\\develop\\tradingagent\\Blockchain-Trading-Lab\\tradingagent\\agent_platform\\adapters\\sqlite\\backup.py",
+      "sha256": "ce11440672268424314a4d315c1b5eaafe3c87ba59ea3d04c9375763754291ea"
+    },
+    {
+      "path": "D:\\develop\\tradingagent\\Blockchain-Trading-Lab\\tradingagent\\agent_platform\\adapters\\binance_direct\\watch_data.py",
+      "sha256": "56874ba52fb07f7ff4929f1456f14e47dacce274091d5b02e939a0595541d173"
+    },
+    {
+      "path": "D:\\develop\\tradingagent\\Blockchain-Trading-Lab\\tradingagent\\agent_platform\\application\\watches.py",
+      "sha256": "6d271a67d232ef7e0bdeb3ffb6ac1f0cca90e3e3c5168d3341066caab31ac3c9"
+    },
+    {
+      "path": "D:\\develop\\tradingagent\\Blockchain-Trading-Lab\\tradingagent\\agent_platform\\runtime\\watches.py",
+      "sha256": "b52bde5d7218acd9361adb266389b520747f1745155130c9c1e695e07d3ef6b8"
+    },
+    {
+      "path": "D:\\develop\\tradingagent\\Blockchain-Trading-Lab\\tradingagent\\agent_platform\\replay\\watches.py",
+      "sha256": "3d04e38101bb2bff14546a0272d2b0cd5029a1f34bb9ac331f29205fe158d553"
+    },
+    {
+      "path": "D:\\develop\\tradingagent\\Blockchain-Trading-Lab\\tradingagent\\examples\\event_watch_offline.py",
+      "sha256": "2d29232ae1cd39e606ccfd26adecf8e2432c7877227ef3437625163c5ba4dbf4"
+    },
+    {
+      "path": "D:\\develop\\tradingagent\\Blockchain-Trading-Lab\\tradingagent\\tests\\fixtures\\watch_cases.py",
+      "sha256": "6b3060d8277ddbb2093bf7c66f8cc97faf370e2fbe1282a194faa7f4f7bf06bb"
+    },
+    {
+      "path": "D:\\develop\\tradingagent\\Blockchain-Trading-Lab\\tradingagent\\tests\\domain\\test_watch_rules.py",
+      "sha256": "20d82fd1a7a254c062a74207bd62b35b8b4a09df1f9b81896472145760954cf4"
+    },
+    {
+      "path": "D:\\develop\\tradingagent\\Blockchain-Trading-Lab\\tradingagent\\tests\\domain\\test_watch_features.py",
+      "sha256": "287d2c40b87c5d02ed3fab54e1b86b1d22dbccc09a7e0a3cc3c1d501a6e7f1bc"
+    },
+    {
+      "path": "D:\\develop\\tradingagent\\Blockchain-Trading-Lab\\tradingagent\\tests\\adapters\\test_watch_store.py",
+      "sha256": "5f25f9c168c2a5d8edfd1a9758e6324225cce08e48265ffbcb4f61d7d827bf6d"
+    },
+    {
+      "path": "D:\\develop\\tradingagent\\Blockchain-Trading-Lab\\tradingagent\\tests\\adapters\\test_agent_event_delivery.py",
+      "sha256": "25669970e137cc12e906d28c4e1530438cb39537120627af33c38ae546b1364c"
+    },
+    {
+      "path": "D:\\develop\\tradingagent\\Blockchain-Trading-Lab\\tradingagent\\tests\\adapters\\test_watch_data.py",
+      "sha256": "9832c7a344ffbb7797c77732cbe78f2f42e3538170a786485f061ca39cb33601"
+    },
+    {
+      "path": "D:\\develop\\tradingagent\\Blockchain-Trading-Lab\\tradingagent\\tests\\runtime\\test_watch_runtime.py",
+      "sha256": "54b0d85675a267d76b920cde9fa261aeebe51bf859ad6baf8f13c1022504cdeb"
+    },
+    {
+      "path": "D:\\develop\\tradingagent\\Blockchain-Trading-Lab\\tradingagent\\tests\\replay\\test_watch_replay.py",
+      "sha256": "9aaa769ccaf8c9a15af5fd1fe83b66650fc4b5dcc0d4c4a0cb43fee6a4b10877"
+    },
+    {
+      "path": "D:\\develop\\tradingagent\\Blockchain-Trading-Lab\\tradingagent\\tests\\architecture\\test_watch_boundaries.py",
+      "sha256": "a75e0dc95281e29daef97d7181fb776eff5665752405586e3809031c43e67699"
+    },
+    {
+      "path": "D:\\develop\\tradingagent\\Blockchain-Trading-Lab\\tradingagent\\tests\\adapters\\test_sqlite_decisions.py",
+      "sha256": "e68c56d4ea61b5d99d4f0987cd0f10678a9d8637bec72267d834608bb3b24d71"
+    },
+    {
+      "path": "D:\\develop\\tradingagent\\Blockchain-Trading-Lab\\tradingagent\\tests\\adapters\\test_operations.py",
+      "sha256": "05cf0ee4b56c4ad0f332b4109329d8c2808c712f9da8f223df910a2f24cc9186"
+    },
+    {
+      "path": "D:\\develop\\tradingagent\\Blockchain-Trading-Lab\\tradingagent\\tests\\adapters\\test_retention.py",
+      "sha256": "7298e763627c4c7fe9b9f09d8b1540d96fc7aa619aaa59e26210d7f427bb51f5"
+    },
+    {
+      "path": "D:\\develop\\tradingagent\\Blockchain-Trading-Lab\\tradingagent\\docs\\event-watch-core.md",
+      "sha256": "b6f4f2ec7c503229c57f45dcd60a4db2fe549b010a140cc8c4ca9894580f6b4f"
+    },
+    {
+      "path": "D:\\develop\\tradingagent\\Blockchain-Trading-Lab\\tradingagent\\docs\\superpowers\\plans\\2026-10-09-event-driven-agent-mvp.md",
+      "sha256": "3def90f8325d174f3432527e6b4e03bb3aaccc9df0f6fb25be23f7ffb7bd376d"
+    }
+  ]
+}

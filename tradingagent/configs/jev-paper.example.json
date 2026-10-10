@@ -1,0 +1,13 @@
+{
+  "trial_total_usd": "1",
+  "single_call_usd": "0.02",
+  "issued_at": null,
+  "expires_at": null,
+  "price": {
+    "version": "jev-price-REPLACE-AFTER-VERIFICATION",
+    "input_usd_per_million": "0.042",
+    "output_usd_per_million": "0",
+    "verified_at": null,
+    "valid_until": null
+  }
+}

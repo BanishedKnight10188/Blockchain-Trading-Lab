@@ -1,0 +1,10 @@
+.cadence-controls{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.cadence-controls label{font-size:14px;color:#3d4d63}
+.cadence-controls select{width:auto;min-width:85px;margin:0}
+.cadence-note{font-size:13px;color:#65768b;margin:0 0 14px}
+.input-settings{padding:16px 0;border-bottom:1px solid #dce3ec;margin-bottom:20px}
+.input-settings [role=status]{font-size:14px;line-height:1.6;margin:12px 0 6px;color:#32475f}
+.input-settings .cadence-note{margin-bottom:0}
+.latency-details{font-size:12px;color:#65768b;margin-top:5px;max-width:310px;white-space:normal}
+.latency-details summary{cursor:pointer;color:#2764bd}.latency-details div{line-height:1.7;margin-top:6px;min-width:160px}
+@media(max-width:720px){.cadence-controls{width:100%}.cadence-controls button{flex:1}.cadence-note{line-height:1.6}}
